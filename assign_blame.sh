@@ -9,11 +9,10 @@
 DATE=$(date +"%s")
 DATABASE=$1
 USER=$2
-ENVIRONMENT=$3
-MESSAGE="Added environment "$3
+MESSAGE=$3
 echo "date:     "$DATE
 echo "DATABASE: "$DATABASE
 echo "USER:     "$USER
 echo "MESSAGE:  "$MESSAGE
 #arguments: database, user, message 
-sqlite3 $DATABASE "PRAGMA foreign_keys = ON; begin; INSERT INTO blame VALUES('$USER', $DATE, '$MESSAGE', (SELECT COUNT(*) FROM blame)); INSERT INTO environment VALUES(\"$ENVIRONMENT\", (SELECT COUNT(*) FROM blame) - 1); commit;"
+sqlite3 $DATABASE "PRAGMA foreign_keys = ON; begin; INSERT INTO blame VALUES('$USER', $DATE, '$MESSAGE', (select count(*) from blame)); commit;"
