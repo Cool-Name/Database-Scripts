@@ -16,4 +16,4 @@ echo "DATABASE: "$DATABASE
 echo "USER:     "$USER
 echo "MESSAGE:  "$MESSAGE
 #arguments: database, user, message 
-sqlite3 $DATABASE "PRAGMA foreign_keys = ON; begin; INSERT INTO blame VALUES('$USER', $DATE, '$MESSAGE', (SELECT COUNT(*) FROM blame)); INSERT INTO environment VALUES(\"$ENVIRONMENT\", (SELECT COUNT(*) FROM blame) - 1); commit;"
+sqlite3 $DATABASE "PRAGMA foreign_keys = ON; begin; INSERT INTO blame VALUES('$USER', $DATE, '$MESSAGE', (SELECT COUNT(*) FROM blame)); INSERT INTO environment VALUES(\"$ENVIRONMENT\", (SELECT COUNT(*) FROM blame) - 1); commit;" && echo "Success"
