@@ -4,7 +4,6 @@
 
 ARGUMENTS="usage: ./list_environments [database]"
 DATABASE=$1
-ALL_ACTIONS_ALL_USERS="selecting all environments"
 
 if [ $# -eq 0 ]
 then
