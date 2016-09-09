@@ -2,12 +2,12 @@
 
 #arguments needed: most likely just database - values returned are of PSV format
 
-ARGUMENTS="usage: ./list_blame [database]"
+ARGUMENTS="usage: list_blame [database]"
 DATABASE=$1
 
 if [ $# -eq 0 ]
 then
-    echo "No arguments supplied: database"
+    echo "$ARGUMENTS"
     exit
 fi
 
