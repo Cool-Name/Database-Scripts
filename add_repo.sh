@@ -18,11 +18,52 @@ URL=$5
 DIR=$6
 ROLE_ID=$7
 MESSAGE="Added repo $URL to role $ROLE_ID"
-echo "date:     "$DATE
-echo "DATABASE: "$DATABASE
-echo "USER:     "$USER
-echo "MESSAGE:  "$MESSAGE
 
 #arguments: database, user, hash, label, url, directory, role_id
 #arguments for repo: hash, label, [id], url, directory, blame*, role*)
-sqlite3 $DATABASE "PRAGMA foreign_keys = ON; begin; INSERT INTO blame VALUES('$USER', $DATE, '$MESSAGE', (SELECT COUNT(*) FROM blame)); INSERT INTO repo VALUES(\"$HASH\", \"$LABEL\", (SELECT COUNT(*) FROM repo), \"$URL\", \"DIR\", (SELECT COUNT(*) FROM blame) - 1, $ROLE_ID); commit;" && echo "SUCCESS"
+if [ $# -eq 0 ]
+then
+    echo "No arguments supplied: database, user*, hash, label, url, directory, role_id*" && exit
+    exit
+fi
+
+if [ -z "$1" ];
+then echo "no database supplied: database, user*, hash, label, url, directory, role_id*" && exit
+fi
+if [ -z "$2" ];
+then echo "no user supplied: database, user*, hash, label, url, directory, role_id*" && exit
+fi
+if [ -z "$3" ];
+then echo "no hash supplied: database, user*, hash, label, url, directory, role_id*" && exit
+fi
+if [ -z "$4" ];
+then echo "no label supplied: database, user*, hash, label, url, directory, role_id*" && exit
+fi
+if [ -z "$5" ];
+then echo "no url supplied: database, user*, hash, label, url, directory, role_id*" && exit
+fi
+if [ -z "$6" ];
+then echo "no directory supplied: database, user*, hash, label, url, directory, role_id*" && exit
+fi
+if [ -z "$7" ];
+then echo "no role supplied: database, user*, hash, label, url, directory, role_id*" && exit
+fi
+
+
+if [ -f "$DATABASE" ] #check the database actually exists
+then
+    if sqlite3 $DATABASE "select * from blame" >/dev/null #check the tables actually exist
+    then 
+	if sqlite3 $DATABASE "PRAGMA foreign_keys = ON; begin; INSERT INTO blame VALUES('$USER', $DATE, '$MESSAGE', (SELECT COUNT(*) FROM blame)); INSERT INTO repo VALUES(\"$HASH\", \"$LABEL\", (SELECT COUNT(*) FROM repo), \"$URL\", \"$DIR\", (SELECT COUNT(*) FROM blame) - 1, $ROLE_ID); commit;" && echo "SUCCESS"
+	then
+	    echo "date:     "$DATE
+	    echo "DATABASE: "$DATABASE
+	    echo "USER:     "$USER
+	    echo "ACTION:   "$MESSAGE
+	fi
+    else echo "tables don't exist in database" && exit
+    fi
+else
+    echo "database doesn't exist" && exit
+fi
+

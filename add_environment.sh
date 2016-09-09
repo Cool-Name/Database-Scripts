@@ -11,9 +11,42 @@ DATABASE=$1
 USER=$2
 ENVIRONMENT=$3
 MESSAGE="Added environment "$3
-echo "date:     "$DATE
-echo "DATABASE: "$DATABASE
-echo "USER:     "$USER
-echo "MESSAGE:  "$MESSAGE
+
+
 #arguments: database, user, message 
-sqlite3 $DATABASE "PRAGMA foreign_keys = ON; begin; INSERT INTO blame VALUES('$USER', $DATE, '$MESSAGE', (SELECT COUNT(*) FROM blame)); INSERT INTO environment VALUES(\"$ENVIRONMENT\", (SELECT COUNT(*) FROM blame) - 1); commit;" && echo "Success"
+
+if [ $# -eq 0 ]
+then
+    echo "No arguments supplied: database, user*, [environment_title]"
+    exit
+fi
+
+if [ -z "$1" ];
+then echo "no database supplied: database, user*, [environment_title]" && exit
+fi
+if [ -z "$2" ];
+then echo "no user supplied: database, user*, [environment_title]" && exit
+fi
+if [ -z "$3" ];
+then echo "no environment title supplied: database, user*, [environment_title]" && exit
+fi
+
+
+if [ -f "$DATABASE" ] #check the database actually exists
+then
+    if sqlite3 $DATABASE "select * from blame" >/dev/null #check the tables actually exist
+    then
+	if sqlite3 $DATABASE "PRAGMA foreign_keys = ON; begin; INSERT INTO blame VALUES('$USER', $DATE, '$MESSAGE', (SELECT COUNT(*) FROM blame)); INSERT INTO environment VALUES(\"$ENVIRONMENT\", (SELECT COUNT(*) FROM blame) - 1); commit;" && echo "Success"
+	    
+	then
+	    echo "date:     "$DATE
+	    echo "DATABASE: "$DATABASE
+	    echo "USER:     "$USER
+	    echo "ACTION:   "$MESSAGE
+	fi
+    else echo "tables don't exist in database" && exit
+    fi
+else
+    echo "database doesn't exist" && exit
+fi
+

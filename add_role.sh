@@ -15,10 +15,6 @@ TITLE=$2
 ENVIRONMENT=$3
 USER=$4
 MESSAGE="Added role $TITLE to environment $ENVIRONMENT"
-echo "date:     "$DATE
-echo "DATABASE: "$DATABASE
-echo "USER:     "$USER
-echo "MESSAGE:  "$MESSAGE
 
 #arguments: database, title, environement, user
 # -->sanity check args here -> make sure it's not empty
@@ -26,20 +22,37 @@ echo "MESSAGE:  "$MESSAGE
 
 if [ $# -eq 0 ]
 then
-    echo "No arguments supplied"
+    echo "No arguments supplied: database,role_title, environment_title*, user*"
     exit
 fi
 
 if [ -z "$1" ];
-then echo "no database supplied" && exit
+then echo "no database supplied: database,role_title, environment_title*, user*" && exit
+fi
+if [ -z "$2" ];
+then echo "no role supplied: database,role_title, environment_title*, user*" && exit
+fi
+if [ -z "$3" ];
+then echo "no environment supplied: database,role_title, environment_title*, user*" && exit
+fi
+if [ -z "$4" ];
+then echo "no user supplied: database,role_title, environment_title*, user*" && exit
 fi
 
-if [ -f $DATABASE ] #check the database actually exists
+if [ -f "$DATABASE" ] #check the database actually exists
 then
     if sqlite3 $DATABASE "select * from blame" >/dev/null #check the tables actually exist
-    then sqlite3 $DATABASE "PRAGMA foreign_keys = ON; begin; INSERT INTO blame VALUES('$USER', $DATE, '$MESSAGE', (SELECT COUNT(*) FROM blame)); INSERT INTO role VALUES(\"$TITLE\", (SELECT COUNT(*) FROM role), \"$ENVIRONMENT\", (SELECT COUNT(*) FROM blame) - 1); commit;" && echo "SUCCESS"
-    else echo "tables don't exist in database"
+    then
+	if sqlite3 $DATABASE "PRAGMA foreign_keys = ON; begin; INSERT INTO blame VALUES('$USER', $DATE, '$MESSAGE', (SELECT COUNT(*) FROM blame)); INSERT INTO role VALUES(\"$TITLE\", (SELECT COUNT(*) FROM role), \"$ENVIRONMENT\", (SELECT COUNT(*) FROM blame) - 1); commit;" && echo "SUCCESS"
+	then 
+	    echo "date:     "$DATE
+	    echo "DATABASE: "$DATABASE
+	    echo "USER:     "$USER
+	    echo "ACTION:   "$MESSAGE
+	fi
+    else echo "tables don't exist in database" && exit
     fi
 else
-    echo "database doesn't exist"
+    echo "database doesn't exist" && exit
 fi
+
