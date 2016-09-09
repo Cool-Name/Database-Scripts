@@ -42,13 +42,13 @@ fi
 if [ -f "$DATABASE" ] #check the database actually exists
 then
     if sqlite3 $DATABASE "select * from blame" >/dev/null #check the tables actually exist
-    then
-	if sqlite3 $DATABASE "PRAGMA foreign_keys = ON; begin; INSERT INTO blame VALUES('$USER', $DATE, '$MESSAGE', (SELECT COUNT(*) FROM blame)); INSERT INTO role VALUES(\"$TITLE\", (SELECT COUNT(*) FROM role), \"$ENVIRONMENT\", (SELECT COUNT(*) FROM blame) - 1); commit;" && echo "SUCCESS"
+    then  #I think there's a special case for the first item added into role if I use this pattern - max returns null when 0 items in table
+	if (sqlite3 $DATABASE "PRAGMA foreign_keys = ON; begin; INSERT INTO blame VALUES('$USER', $DATE, '$MESSAGE', (select max(id) from blame) + 1); INSERT INTO role VALUES(\"$TITLE\", (SELECT max(role_id) from role) + 1, \"$ENVIRONMENT\", (SELECT max(id) from blame)); commit;" || sqlite3 $DATABASE "PRAGMA foreign_keys = ON; begin; INSERT INTO blame VALUES('$USER', $DATE, '$MESSAGE', (select max(id) from blame) + 1); INSERT INTO role VALUES(\"$TITLE\", 0, \"$ENVIRONMENT\", (SELECT max(id) from blame)); commit;") && echo "SUCCESS"
 	then 
 	    echo "date:     "$DATE
 	    echo "DATABASE: "$DATABASE
 	    echo "USER:     "$USER
-	    echo "ACTION:   "$MESSAGE
+	    echo "ACTION:   "$MESSAGE	    
 	fi
     else echo "tables don't exist in database" && exit
     fi

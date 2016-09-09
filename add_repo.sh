@@ -53,8 +53,8 @@ fi
 if [ -f "$DATABASE" ] #check the database actually exists
 then
     if sqlite3 $DATABASE "select * from blame" >/dev/null #check the tables actually exist
-    then 
-	if sqlite3 $DATABASE "PRAGMA foreign_keys = ON; begin; INSERT INTO blame VALUES('$USER', $DATE, '$MESSAGE', (SELECT COUNT(*) FROM blame)); INSERT INTO repo VALUES(\"$HASH\", \"$LABEL\", (SELECT COUNT(*) FROM repo), \"$URL\", \"$DIR\", (SELECT COUNT(*) FROM blame) - 1, $ROLE_ID); commit;" && echo "SUCCESS"
+    then #handle the missing vals
+	if (sqlite3 $DATABASE "PRAGMA foreign_keys = ON; begin; INSERT INTO blame VALUES('$USER', $DATE, '$MESSAGE', (SELECT max(id) FROM blame) + 1); INSERT INTO repo VALUES(\"$HASH\", \"$LABEL\", (SELECT max(repo_id) FROM repo) + 1, \"$URL\", \"$DIR\", (SELECT max(id) FROM blame), $ROLE_ID); commit;"  || sqlite3 $DATABASE "PRAGMA foreign_keys = ON; begin; INSERT INTO blame VALUES('$USER', $DATE, '$MESSAGE', (SELECT COUNT(*) FROM blame)); INSERT INTO repo VALUES(\"$HASH\", \"$LABEL\", 0, \"$URL\", \"$DIR\", (SELECT COUNT(*) FROM blame), $ROLE_ID); commit;") && echo "SUCCESS"
 	then
 	    echo "date:     "$DATE
 	    echo "DATABASE: "$DATABASE
