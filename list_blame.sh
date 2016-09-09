@@ -4,7 +4,6 @@
 
 ARGUMENTS="usage: ./list_blame [database]"
 DATABASE=$1
-ALL_ACTIONS_ALL_USERS="selecting all actions from all users"
 
 if [ $# -eq 0 ]
 then
@@ -20,7 +19,6 @@ then echo "database '$DATABASE' doesn't exist" && exit
 fi
 fi
     
-    echo "no arguments supplied: $ALL_ACTIONS_ALL_USERS"
 #select all actions from all users
-sqlite3 $DATABASE "select * from blame;" && exit
+sqlite3 $DATABASE "-header" "-list" "select * from blame;" && exit
 exit
