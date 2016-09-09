@@ -29,7 +29,7 @@ fi
 #select all actions from all users
 if [ -z $ENVIRONMENT ];
 then
-    sqlite3 $DATABASE "-header" "-list" "select * from role;" && exit
+    sqlite3 $DATABASE "-list" "select role_title, role_id, env from role;" && exit
 else
-    sqlite3 $DATABASE "-header" "-list" "select * from role WHERE env = '$ENVIRONMENT';" && exit
+    sqlite3 $DATABASE "-list" "select role_title, role_id, env from role WHERE env = '$ENVIRONMENT';" && exit
 fi

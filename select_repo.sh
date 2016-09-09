@@ -38,7 +38,7 @@ if [[ "$ARG" == "-r" ]]
 then
     if ! [ -z "$ROLE" ] ; then
 	if [ "$ROLE" -eq "$ROLE" ] 2>/dev/null; then #evil black magic
-	    sqlite3 $DATABASE "-header" "-list" "select * from repo WHERE role_link is ($ROLE);" &&exit
+	    sqlite3 $DATABASE "-list" "select label, dir, url, hash, role_link from repo WHERE role_link is ($ROLE);" &&exit
 	fi
     fi
 fi
@@ -47,7 +47,7 @@ if [[ "$ARG" == "-e" ]]
 then
     if ! [ -z "$ENV" ] ; then
 	#select all repos where the matching role matches an environment - select all repos from an env
-	sqlite3 $DATABASE "-header" "-list" "select * from repo where role_link in (select role_id from role where env in (select title from environment where title is '$ENV'));" && exit
+	sqlite3 $DATABASE "-list" "select label, dir, url, hash, role_link from repo where role_link in (select role_id from role where env in (select title from environment where title is '$ENV'));" && exit
     fi
 fi
 
