@@ -7,7 +7,7 @@ DATABASE=$1
 
 if [ $# -eq 0 ]
 then
-    echo "No arguments supplied: database"
+    echo "$ARGUMENTS"
     exit
 fi
 
