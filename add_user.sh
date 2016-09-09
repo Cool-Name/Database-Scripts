@@ -13,7 +13,7 @@ MESSAGE="User $USER added to list of users"
 
 if [ $# -eq 0 ]
 then
-    echo "No arguments supplied: dabase, [user]"
+    echo "No arguments supplied: database, [user]"
     exit
 fi
 
