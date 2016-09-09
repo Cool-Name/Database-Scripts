@@ -20,5 +20,5 @@ fi
 fi
     
 #select all actions from all users
-sqlite3 $DATABASE "-header" "-list" "select * from blame;" && exit
+sqlite3 $DATABASE "-list" "select * from blame;" && exit
 exit
