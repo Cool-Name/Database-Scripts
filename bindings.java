@@ -17,15 +17,24 @@ public class bindings {
     // 6 - create new environment
     // 7 - create new role based on existing environment
     // 8 - create new repo based on existing role
-    // x - (maybe) create new user
+    // X - (maybe) create new user
 
     // 9 - duplicate environment (including roles, repos)
-    // 0 - duplicate repo pointing to envionment(including all repos)
+    // A - duplicate repo pointing to envionment(including all repos)
+
+    // B - delete environment
+    // C - delete role
+    // D - delete repo
+    //###################################################################################//
 
     //###################################################################################//
     //operations that are supported:
     // 1 - list of environments
+    // 2 - get list of all roles
     // 6 - add environment
+    // 7 - create new role based on existing environment
+    //###################################################################################//
+
     //###################################################################################//
     //                                                                                   //
     //                       ACTUAL DATABASE INTERACTION FUNCTIONS                       //
@@ -66,6 +75,64 @@ public class bindings {
 
 	return run_command("./add_environment.sh " + dbname + " " + user + " " + envname);	    
     }
+
+    // 7 - create new role based on existing environment
+    // function <- (user, env, role)
+    // requires:
+    //     database name
+    //     environment name
+    //     user name
+    //     role name
+    public static Pair<List<String>, Integer> 
+	DB_add_role(String user,String envname, String rolename) throws Exception {
+	if(!validarg(dbname))
+	    return err_helper("No database supplied");           //sanity check
+
+	Pair<List<String>, Integer> p = exists(dbname);          //check file exists
+	if(p != null) return p;
+	
+	if(!validarg(user)) return err_helper("invalid argument for user name");
+	
+	if(!validarg(envname)) return err_helper("invalid argument for env name");
+
+	if(!validarg(rolename)) return err_helper("invalid argument for role name");
+
+	return run_command("./add_role.sh " + dbname + " " + rolename + " "
+			   + " " + envname + " " + user);
+    }
+
+    // 2 - get list of all roles
+    // function <- ()
+    // requires:
+    //     database name
+    public static Pair<List<String>, Integer> 
+	DB_list_roles() throws Exception {
+	if(!validarg(dbname))
+	    return err_helper("No database supplied");           //sanity check
+
+	Pair<List<String>, Integer> p = exists(dbname);          //check file exists
+	if(p != null) return p;
+	
+	return run_command("./select_role.sh " + dbname);	    
+    }
+
+    // 3 - get list of all roles matching environment
+    // function <- (envname)
+    // requires:
+    //     database name
+    public static Pair<List<String>, Integer> 
+	DB_list_roles(String envname) throws Exception {
+	if(!validarg(dbname))
+	    return err_helper("No database supplied");           //sanity check
+
+	Pair<List<String>, Integer> p = exists(dbname);          //check file exists
+	if(p != null) return p;
+	
+	if(!validarg(envname)) return err_helper("invalid argument for env name");
+	
+	return run_command("./select_role.sh " + dbname + " " + envname);	    
+    }
+
     //###################################################################################//
     //                                                                                   //
     //                               MISC UTILITY FUNCTIONS                              //

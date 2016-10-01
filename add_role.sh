@@ -49,10 +49,11 @@ then
 	    echo "DATABASE: "$DATABASE
 	    echo "USER:     "$USER
 	    echo "ACTION:   "$MESSAGE	    
+	    exit 0
 	fi
-    else echo "tables don't exist in database" && exit
+    else echo "tables don't exist in database" && exit 1
     fi
 else
-    echo "database doesn't exist" && exit
+    echo "database doesn't exist" && exit 1
 fi
-
+exit 1
