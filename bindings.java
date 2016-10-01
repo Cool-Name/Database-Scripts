@@ -3,9 +3,10 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 public class bindings {
-    public static String dbname;
-    
+    //name of the database: this should be set once, or even better, hardcoded
+    public static String dbname;    
 
+    //###################################################################################//
     //operations that should be supported:
     // 1 - get list of all environments
     // 2 - get list of all roles
@@ -21,9 +22,10 @@ public class bindings {
     // 9 - duplicate environment (including roles, repos)
     // 0 - duplicate repo pointing to envionment(including all repos)
 
+    //###################################################################################//
     //operations that are supported:
-
-
+    // 1 - list of environments
+    // 6 - add environment
     //###################################################################################//
     //                                                                                   //
     //                       ACTUAL DATABASE INTERACTION FUNCTIONS                       //
@@ -31,21 +33,55 @@ public class bindings {
     //###################################################################################//    
     
     // 1 - get list of all environments
+    // function: <- ()
     // requires:
     //     database name
     public static Pair<List<String>, Integer> DB_list_environments() throws Exception {
-	Pair<List<String>, Integer> p;
 	if(dbname == null || dbname == "")
-	    return err_helper("No database supplied");
+	    return err_helper("No database supplied");           //sanity check
 	
-	return run_command("./list_environment.sh " + dbname);	    
+	Pair<List<String>, Integer> p = exists(dbname);          //check file exists
+	if(p != null) return p;
+
+	return run_command("./list_environments.sh " + dbname);	    
     }
 
+    // 6 - insert environment
+    // function: <- (user, env)
+    // requires:
+    //     database name
+    //     environment name
+    //     user
+    public static Pair<List<String>, Integer> 
+	DB_add_environment(String user,String envname) throws Exception {
+	if(!validarg(dbname))
+	    return err_helper("No database supplied");           //sanity check
+
+	Pair<List<String>, Integer> p = exists(dbname);          //check file exists
+	if(p != null) return p;
+	
+	if(!validarg(user)) return err_helper("invalid argument for user");
+	
+	if(!validarg(envname)) return err_helper("invalid argument for envname");
+
+	return run_command("./add_environment.sh " + dbname + " " + user + " " + envname);	    
+    }
     //###################################################################################//
     //                                                                                   //
     //                               MISC UTILITY FUNCTIONS                              //
     //                                                                                   //
     //###################################################################################//    
+    
+    //checks argument ""exists""
+    public static boolean validarg(String s) {	
+	return !(s == null || s.equals(""));
+    }
+    
+    public static Pair<List<String>, Integer> exists(String f) throws Exception {
+	if(run_command("[ -f '" + f + "' ]").val != 0)
+	    return err_helper("Supplied database does not exist");
+	else return null;
+    }
     
     public static void setDB(String _dbname) {
 	dbname = _dbname;
@@ -60,7 +96,6 @@ public class bindings {
 	ret.val = 1;
 	return ret;
     }
-
 
     //###################################################################################//
     //                                                                                   //
