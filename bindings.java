@@ -30,6 +30,37 @@ public class bindings {
     //                                                                                   //
     //###################################################################################//    
     
+    // 1 - get list of all environments
+    // requires:
+    //     database name
+    public static Pair<List<String>, Integer> DB_list_environments() throws Exception {
+	Pair<List<String>, Integer> p;
+	if(dbname == null || dbname == "")
+	    return err_helper("No database supplied");
+	
+	return run_command("./list_environment.sh " + dbname);	    
+    }
+
+    //###################################################################################//
+    //                                                                                   //
+    //                               MISC UTILITY FUNCTIONS                              //
+    //                                                                                   //
+    //###################################################################################//    
+    
+    public static void setDB(String _dbname) {
+	dbname = _dbname;
+    }
+
+    //generate a prog_error without actually running a program
+    public static Pair<List<String>, Integer> err_helper(String _str) {
+	Pair<List<String>, Integer> ret = new Pair<List<String>, Integer>();
+	List<String> str = new ArrayList<String>();
+	str.add(_str);
+	ret.res = str;
+	ret.val = 1;
+	return ret;
+    }
+
 
     //###################################################################################//
     //                                                                                   //
