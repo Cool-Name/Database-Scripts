@@ -11,7 +11,7 @@ public class bindings {
     // 1 - get list of all environments
     // 2 - get list of all roles
     // 3 - get list of all roles matching environment
-    // 4 - get list of all repos
+    // 4 - get list of all repos matching environment
     // 5 - get list of all repos matching role
 
     // 6 - create new environment
@@ -31,8 +31,12 @@ public class bindings {
     //operations that are supported:
     // 1 - list of environments
     // 2 - get list of all roles
+    // 3 - get list of all roles matching environment
+    // 4 - get list of all repos matching environment
+    // 5 - get list of all repos matching role
     // 6 - add environment
     // 7 - create new role based on existing environment
+    // 8 - create new repo based on existing role
     //###################################################################################//
 
     //###################################################################################//
@@ -40,6 +44,79 @@ public class bindings {
     //                       ACTUAL DATABASE INTERACTION FUNCTIONS                       //
     //                                                                                   //
     //###################################################################################//    
+    
+    // 8 - create new repo based on existing role
+    // function <- (user, rolenum, hash, label, url, directory)
+    // requires:
+    //     database name
+    //     role id
+    //     user name
+    //     commit hash
+    //     arbitrary label
+    //     git url
+    //     directory
+    public static Pair<List<String>, Integer> 
+	DB_add_repo(int roleid, String user, String hash, String label,
+		    String url, String directory) throws Exception {
+	if(!validarg(dbname))
+	    return err_helper("No database supplied");           //sanity check
+	
+	Pair<List<String>, Integer> p = exists(dbname);          //check file exists
+	if(p != null) return p;
+	
+	if(!validarg(user)) return err_helper("invalid argument for user name");
+	
+	if(!validarg(hash)) return err_helper("invalid argument for hash name");
+	
+	if(!validarg(label)) return err_helper("invalid argument for label name");
+
+	if(!validarg(label)) return err_helper("invalid argument for url");
+	
+	if(!validarg(label)) return err_helper("invalid argument for directory");
+	
+	
+	return run_command("./add_repo.sh " + dbname +
+			   " '" + user +
+			   "' '" + hash +
+			   "' '" + label +
+			   "' '" + url +
+			   "' '" + directory +
+			   "' " + roleid);			   
+    }
+
+    // 4 - get list of all repos matching environment
+    // function <- (env)
+    // requires:
+    //     database name
+    //     environment name
+    public static Pair<List<String>, Integer> 
+	DB_list_repos(String env) throws Exception {
+	if(!validarg(dbname))
+	    return err_helper("No database supplied");           //sanity check
+
+	Pair<List<String>, Integer> p = exists(dbname);          //check file exists
+	if(p != null) return p;
+	
+	if(!validarg(env)) return err_helper("invalid argument for envname");
+	
+	return run_command("./select_repo.sh " + dbname + " -e '" + env + "'");	    
+    }
+
+    // 5 - get list of all repos matching role
+    // function <- (roleid)
+    // requires:
+    //     database name
+    //     role id
+    public static Pair<List<String>, Integer> 
+	DB_list_rrepos(int roleid) throws Exception {
+	if(!validarg(dbname))
+	    return err_helper("No database supplied");           //sanity check
+
+	Pair<List<String>, Integer> p = exists(dbname);          //check file exists
+	if(p != null) return p;
+	
+	return run_command("./select_repo.sh " + dbname + " -r " + roleid);
+    }
     
     // 1 - get list of all environments
     // function: <- ()
@@ -73,7 +150,7 @@ public class bindings {
 	
 	if(!validarg(envname)) return err_helper("invalid argument for envname");
 
-	return run_command("./add_environment.sh " + dbname + " " + user + " " + envname);	    
+	return run_command("./add_environment.sh " + dbname + " '" + user + "' " + envname);	    
     }
 
     // 7 - create new role based on existing environment
@@ -97,8 +174,8 @@ public class bindings {
 
 	if(!validarg(rolename)) return err_helper("invalid argument for role name");
 
-	return run_command("./add_role.sh " + dbname + " " + rolename + " "
-			   + " " + envname + " " + user);
+	return run_command("./add_role.sh " + dbname + " '" + rolename + "' '"
+			   + envname + "' '" + user + "'");
     }
 
     // 2 - get list of all roles
@@ -130,7 +207,7 @@ public class bindings {
 	
 	if(!validarg(envname)) return err_helper("invalid argument for env name");
 	
-	return run_command("./select_role.sh " + dbname + " " + envname);	    
+	return run_command("./select_role.sh " + dbname + " '" + envname + "'");	    
     }
 
     //###################################################################################//
