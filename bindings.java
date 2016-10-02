@@ -44,6 +44,70 @@ public class bindings {
     //                       ACTUAL DATABASE INTERACTION FUNCTIONS                       //
     //                                                                                   //
     //###################################################################################//    
+
+    // B - delete environment
+    // function <- (user, envname)
+    // requires:
+    //     database name
+    //     user name
+    //     environment
+    public static Pair<List<String>, Integer> 
+	DB_rm_env(String user, String envname) throws Exception {
+	if(!validarg(dbname))
+	    return err_helper("No database supplied");           //sanity check
+
+	Pair<List<String>, Integer> p = exists(dbname);          //check file exists
+	if(p != null) return p;
+	
+	if(!validarg(envname)) return err_helper("invalid argument for env name");
+	if(!validarg(user)) return err_helper("invalid argument for user name");
+	
+	return run_command("./remove_env.sh " + dbname + " '" + envname + "' '" + user + "'");	    
+    }
+
+    // C - delete role    
+    // function <- (user, role_id)
+    // requires:
+    //     database name
+    //     user name
+    //     role ID
+    public static Pair<List<String>, Integer> 
+	DB_rm_role(String user, int role_id) throws Exception {
+	if(!validarg(dbname))
+	    return err_helper("No database supplied");           //sanity check
+
+	Pair<List<String>, Integer> p = exists(dbname);          //check file exists
+	if(p != null) return p;
+	
+	if(!validarg(user)) return err_helper("invalid argument for user name");
+	
+	return run_command("./remove_role.sh " + dbname + " " + role_id + " '" + user + "'");
+    }
+
+
+    // D - delete repo
+    // function <- (user, repo_id)
+    // requires:
+    //     database name
+    //     user name
+    //     repo ID
+    public static Pair<List<String>, Integer> 
+	DB_rm_repo(String user, int repo_id) throws Exception {
+	if(!validarg(dbname))
+	    return err_helper("No database supplied");           //sanity check
+
+	Pair<List<String>, Integer> p = exists(dbname);          //check file exists
+	if(p != null) return p;
+	
+	if(!validarg(user)) return err_helper("invalid argument for user name");
+	
+	return run_command("./remove_repo.sh " + dbname + " " + repo_id + " '" + user + "'");
+    }
+
+
+
+
+
     
     // 8 - create new repo based on existing role
     // function <- (user, rolenum, hash, label, url, directory)
