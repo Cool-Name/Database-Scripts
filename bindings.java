@@ -172,7 +172,7 @@ public class bindings {
     //     database name
     //     role id
     public static Pair<List<String>, Integer> 
-	DB_list_rrepos(int roleid) throws Exception {
+	DB_list_repos(int roleid) throws Exception {
 	if(!validarg(dbname))
 	    return err_helper("No database supplied");           //sanity check
 
